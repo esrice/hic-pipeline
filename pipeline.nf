@@ -95,7 +95,7 @@ process salsa {
     file 'salsa/*' into salsa_out
 
     """
-    python run_pipeline.py -a ref.fa -l ref.fa.fai \
+    python \$SALSA_DIR/run_pipeline.py -a ref.fa -l ref.fa.fai \
         -b combined.bed -e ${params.enzyme} -o salsa -m yes -i 10 -p yes
     """
 }

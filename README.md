@@ -15,7 +15,7 @@ installed:
 * [bwa](https://github.com/lh3/bwa) (tested with 0.7)
 * [samtools](http://www.htslib.org/) (tested with 1.9)
 * [bedtools](https://bedtools.readthedocs.io/en/latest/) (tested with 2.26)
-* python3
+* python3 and [pysam](https://pysam.readthedocs.io/en/latest/api.html)
 * [SALSA2](https://github.com/marbl/SALSA) (requires python2.7)
 
 No installation is necessary for this pipeline; just download it and put the
@@ -82,7 +82,7 @@ instructions on how to run the pipeline, e.g., whether to run it locally or
 using a cluster scheduler. You can read the nextflow
 [documention](https://www.nextflow.io/docs/latest/config.html) on configuration
 for more information, but here's what I use to run the pipeline on SLURM:
-```
+```groovy
 process {
     executor = 'slurm'
     queue = 'BioCompute'
@@ -97,8 +97,13 @@ Make sure the software specified in the Requirements section is installed and
 in your path. If you're in an HPC/cluster environment that uses the `module`
 system for software, make sure to tell nextflow to load the correct modules,
 e.g., by putting the following line in `nextflow.config`:
+```groovy
+process.module = 'bwa/0.7:samtools/1.9:bedtools/2.26'
 ```
-process.module = 'bwa/0.7:samtools/1.9:bedtools/2.26:salsa/2.2'
+
+Also, let nextflow know where the SALSA2 python files live:
+```groovy
+env.SALSA_PATH = '/path/to/SALSA'
 ```
 
 #### Configuring to use containers
