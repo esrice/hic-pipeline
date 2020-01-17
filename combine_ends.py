@@ -16,7 +16,7 @@ import pysam
 class MismatchedReadsError(Exception):
     def __init__(self, line_number, r1_name, r2_name):
         self.message = """Mismatched R1 and R2 read names on the {}th read of
-            R1 ({}) and R2 ({})""".format(r1_name, r2_name)
+            R1 ({}) and R2 ({})""".format(line_number, r1_name, r2_name)
 
 
 def parse_args():
