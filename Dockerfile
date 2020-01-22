@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN apt-get -y update
 RUN apt-get -y install python2.7 python-pip python3 python3-pip wget \
-    build-essential libboost-all-dev git libbz2-dev liblzma-dev
+    build-essential libboost-all-dev git libbz2-dev liblzma-dev zlib1g-dev
 
 # install bwa
 RUN git clone https://github.com/lh3/bwa.git
@@ -21,6 +21,7 @@ RUN wget https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools
 RUN chmod +x bedtools && mv bedtools /usr/bin/
 
 # install pipeline scripts
+RUN pip3 install Cython
 RUN pip3 install pysam
 RUN git clone https://github.com/esrice/slurm-hic.git
 RUN mv slurm-hic/*.py /usr/bin/
