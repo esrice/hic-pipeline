@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Given an R1 and an R2 bam file that have been filtered to remove the non-5' ends
-of chimeric alignments (with remove_chimeras.py), combine them into a single
-bam file.
+Given an R1 and an R2 bam file that have been filtered to remove the non-5'
+ends of chimeric alignments (with remove_chimeras.py), combine them into a
+single bam file.
 
 Loosely based on
 https://github.com/ArimaGenomics/mapping_pipeline/blob/master/two_read_bam_combiner.pl
@@ -12,12 +12,6 @@ import argparse
 import sys
 
 import pysam
-
-class MismatchedReadsError(Exception):
-    def __init__(self, line_number, r1_name, r2_name):
-        self.message = """Mismatched R1 and R2 read names on the {}th read of
-            R1 ({}) and R2 ({})""".format(line_number, r1_name, r2_name)
-        super().__init__(self.message)
 
 
 def parse_args():
@@ -67,7 +61,7 @@ def pair_reads(r1, r2):
                     - r2.reference_start)
             r1.template_length = -1 * tlen
             r2.template_length = tlen
-    else: # ends map to different references, so just set RNEXT
+    else:  # ends map to different references, so just set RNEXT
         r1.next_reference_name = r2.reference_name
         r2.next_reference_name = r1.reference_name
 
@@ -89,13 +83,31 @@ def pair_reads(r1, r2):
     return r1, r2
 
 
+def next_or_exit(iterator):
+    """
+    Just like next(iterator), except that if there is nothing more in
+    the iterator, it runs sys.exit() rather than raising a StopIteration
+    """
+    try:
+        return next(iterator)
+    except StopIteration:
+        sys.exit()
+
+
 def main():
     args = parse_args()
     outfile = pysam.AlignmentFile(args.outfile, 'wb', template=args.r1_bam)
 
-    for i, (r1, r2) in enumerate(zip(args.r1_bam, args.r2_bam)):
-        if r1.query_name != r2.query_name:
-            raise MismatchedReadsError(i, r1.query_name, r2.query_name)
+    r1, r2 = next_or_exit(args.r1_bam), next_or_exit(args.r2_bam)
+    while r1 and r2:
+        # if r1 and r2 iters are not on the same read, advance the
+        # one that's on the read with the lexographically lesser
+        # name until they are
+        while r1.query_name != r2.query_name:
+            if r1.query_name < r2.query_name:
+                r1 = next_or_exit(args.r1_bam)
+            if r1.query_name > r2.query_name:
+                r2 = next_or_exit(args.r2_bam)
 
         if (not r1.is_unmapped and not r2.is_unmapped
                 and r1.mapping_quality >= args.mapq
@@ -106,6 +118,7 @@ def main():
             outfile.write(r1)
             outfile.write(r2)
 
+        r1, r2 = next_or_exit(args.r1_bam), next_or_exit(args.r2_bam)
 
 if __name__ == '__main__':
     main()
