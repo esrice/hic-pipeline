@@ -1,11 +1,11 @@
-# slurm-hic
-A pipeline for scaffolding a genome assembly using Hi-C and SALSA2 on SLURM,
+# hic-pipeline
+A pipeline for scaffolding a genome assembly using Hi-C and SALSA2,
 generalizable to whatever job scheduler or local system you are using. Loosely
 based on the [Arima Hi-C mapping pipeline](https://github.com/ArimaGenomics/mapping_pipeline).
 
 ## Options for running
 I use [nextflow](https://www.nextflow.io/) to run this pipeline, because it
-automatically deals with submitting SLURM jobs and containerization. You can run
+automatically deals with submitting cluster jobs and containerization. You can run
 it manually too, though, or write your own scripts. There is a section below for
 both of these options.
 
@@ -36,7 +36,7 @@ samtools faidx contigs.fa
 Now, align the R1 and R2 reads to your contigs separately, filtering the output
 through the `filter_chimeras.py` script to remove experimental artifacts from
 the alignments:
-```
+```bash
 bwa mem contigs.fa HiC-reads_R1.fastq.gz | samtools view -bh - \
     | filter-chimeras.py - > r1.bam
 bwa mem contigs.fa HiC-reads_R2.fastq.gz | samtools view -bh - \
