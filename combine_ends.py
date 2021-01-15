@@ -18,14 +18,26 @@ def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     # cannot use type=lambda because template is needed, which comes
     # from the infile
-    parser.add_argument('-o', '--outfile', default='-', nargs='?',
-                        help='where to put filtered bam')
-    parser.add_argument('-q', '--mapq', type=int, default=20,
-                        help='minimum MAPQ for both ends to keep a pair [20]')
-    parser.add_argument('r1_bam', type=lambda f: pysam.AlignmentFile(f, 'rb'),
-                        help='bam file containing R1 alignments')
-    parser.add_argument('r2_bam', type=lambda f: pysam.AlignmentFile(f, 'rb'),
-                        help='bam file containing R2 alignments')
+    parser.add_argument(
+        "-o", "--outfile", default="-", nargs="?", help="where to put filtered bam"
+    )
+    parser.add_argument(
+        "-q",
+        "--mapq",
+        type=int,
+        default=20,
+        help="minimum MAPQ for both ends to keep a pair [20]",
+    )
+    parser.add_argument(
+        "r1_bam",
+        type=lambda f: pysam.AlignmentFile(f, "rb"),
+        help="bam file containing R1 alignments",
+    )
+    parser.add_argument(
+        "r2_bam",
+        type=lambda f: pysam.AlignmentFile(f, "rb"),
+        help="bam file containing R2 alignments",
+    )
     return parser.parse_args()
 
 
@@ -47,18 +59,22 @@ def pair_reads(r1, r2):
     # if the two ends map to the same reference, we need to set RNEXT
     # to '=' for both reads and also calculate the TLEN
     if r1.reference_name == r2.reference_name:
-        r1.next_reference_name = '='
-        r2.next_reference_name = '='
+        r1.next_reference_name = "="
+        r2.next_reference_name = "="
         if r1.reference_start < r2.reference_start:
-            tlen = (r2.reference_start
-                    + max(r2.get_reference_positions())
-                    - r1.reference_start)
+            tlen = (
+                r2.reference_start
+                + max(r2.get_reference_positions())
+                - r1.reference_start
+            )
             r1.template_length = tlen
             r2.template_length = -1 * tlen
         else:
-            tlen = (r1.reference_start
-                    + max(r1.get_reference_positions())
-                    - r2.reference_start)
+            tlen = (
+                r1.reference_start
+                + max(r1.get_reference_positions())
+                - r2.reference_start
+            )
             r1.template_length = -1 * tlen
             r2.template_length = tlen
     else:  # ends map to different references, so just set RNEXT
@@ -96,7 +112,7 @@ def next_or_exit(iterator):
 
 def main():
     args = parse_args()
-    outfile = pysam.AlignmentFile(args.outfile, 'wb', template=args.r1_bam)
+    outfile = pysam.AlignmentFile(args.outfile, "wb", template=args.r1_bam)
 
     r1, r2 = next_or_exit(args.r1_bam), next_or_exit(args.r2_bam)
     while r1 and r2:
@@ -109,10 +125,12 @@ def main():
             if r1.query_name > r2.query_name:
                 r2 = next_or_exit(args.r2_bam)
 
-        if (not r1.is_unmapped and not r2.is_unmapped
-                and r1.mapping_quality >= args.mapq
-                and r2.mapping_quality >= args.mapq):
-
+        if (
+            not r1.is_unmapped
+            and not r2.is_unmapped
+            and r1.mapping_quality >= args.mapq
+            and r2.mapping_quality >= args.mapq
+        ):
             r1, r2 = pair_reads(r1, r2)
 
             outfile.write(r1)
@@ -120,7 +138,6 @@ def main():
 
         r1, r2 = next_or_exit(args.r1_bam), next_or_exit(args.r2_bam)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
-
-

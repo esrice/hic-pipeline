@@ -18,15 +18,20 @@ import pysam
 # string, but does not seem to be exposed as a constant anywhere
 BAM_CMATCH = 0
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     # cannot use type=lambda because template is needed, which comes
     # from the infile
-    parser.add_argument('-o', '--outfile', default='-', nargs='?',
-                        help='where to put filtered bam')
-    parser.add_argument('in_bam', type=lambda f: pysam.AlignmentFile(f, 'rb'),
-                        nargs='?',
-                        help='bam to remove chimeric alignments from')
+    parser.add_argument(
+        "-o", "--outfile", default="-", nargs="?", help="where to put filtered bam"
+    )
+    parser.add_argument(
+        "in_bam",
+        type=lambda f: pysam.AlignmentFile(f, "rb"),
+        nargs="?",
+        help="bam to remove chimeric alignments from",
+    )
     return parser.parse_args()
 
 
@@ -43,10 +48,9 @@ def is_useful_segment(segment):
     """
     if segment.is_unmapped:
         return False
-    if ((not segment.is_reverse
-            and segment.cigartuples[0][0] == BAM_CMATCH)
-            or (segment.is_reverse
-            and segment.cigartuples[-1][0] == BAM_CMATCH)):
+    if (not segment.is_reverse and segment.cigartuples[0][0] == BAM_CMATCH) or (
+        segment.is_reverse and segment.cigartuples[-1][0] == BAM_CMATCH
+    ):
         return True
     else:
         return False
@@ -81,14 +85,16 @@ def choose_segment_to_write(segments):
 
 def main():
     args = parse_args()
-    outfile = pysam.AlignmentFile(args.outfile, 'wb', template=args.in_bam)
+    outfile = pysam.AlignmentFile(args.outfile, "wb", template=args.in_bam)
 
     segments_in_read = []
     for segment in args.in_bam:
         # if we are looking at a new read now, we need to output the
         # good part of the previous read before moving on
-        if (len(segments_in_read) != 0 and
-                segments_in_read[-1].query_name != segment.query_name):
+        if (
+            len(segments_in_read) != 0
+            and segments_in_read[-1].query_name != segment.query_name
+        ):
             outfile.write(choose_segment_to_write(segments_in_read))
             segments_in_read = []
 
@@ -97,7 +103,5 @@ def main():
     outfile.write(choose_segment_to_write(segments_in_read))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-
