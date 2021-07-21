@@ -84,7 +84,7 @@ process bam2bed {
 }
 
 process salsa {
-    publishDir 'salsa_out'
+    publishDir 'salsa_out', mode: 'move'
 
     input:
     file 'ref.fa' from reference_file
