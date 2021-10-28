@@ -1,8 +1,5 @@
 #!/usr/bin/env nextflow
 
-params.reference = 'contigs.fa'
-params.r1_reads = 'HiC-reads_R1.fastq.gz'
-params.r2_reads = 'HiC-reads_R2.fastq.gz'
 params.enzyme = 'GATC'
 
 reference_file = file(params.reference)
