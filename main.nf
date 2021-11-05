@@ -76,7 +76,7 @@ process bam2bed {
     file 'combined.bed' into combinedbed
 
     """
-    bedtools bamtobed -i combined.bam | sort -k 4 > combined.bed
+    bedtools bamtobed -i combined.bam | sort -k 4 -T . > combined.bed
     """
 }
 
