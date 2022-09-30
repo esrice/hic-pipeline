@@ -3,6 +3,13 @@ A pipeline for scaffolding a genome assembly using Hi-C and SALSA2,
 generalizable to whatever job scheduler or local system you are using. Loosely
 based on the [Arima Hi-C mapping pipeline](https://github.com/ArimaGenomics/mapping_pipeline).
 
+*N.B.* (30 September 2022): I have developed a new pipeline for scaffolding with
+Hi-C reads. It produces much better results thanks to improved algorithms for
+mapping (chromap instead of bwa + postprocessing) and scaffolding (YAHS instead
+of SALSA2). I strongly recommend using that one now:
+
+<https://github.com/WarrenLab/hic-scaffolding-nf>
+
 ## Options for running
 I use [nextflow](https://www.nextflow.io/) to run this pipeline, because it
 automatically deals with submitting cluster jobs and containerization. You can run
